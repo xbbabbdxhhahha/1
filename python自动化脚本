@@ -1,0 +1,52 @@
+import requests  
+from lxml import etree  
+import hashlib  
+import time  
+import webbrowser 
+from selenium import webdriver  
+
+def fetch_and_hash_content(url):  
+    # 发送请求  
+    #a=true
+    #while(a):
+    response = requests.get(url)  
+    response.raise_for_status()  # 如果请求有错误，将抛出HTTPError异常  
+      
+    # 获取网页内容  
+    content = response.text  
+      
+    # 使用SHA256算法对内容进行哈希  
+    content_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()  
+      
+    return content_hash  
+  
+def monitor_webpage(url, interval=60):  
+    # 初始化前一次哈希值  
+    previous_hash = None  
+      
+    while True:  
+        current_hash = fetch_and_hash_content(url)  
+          
+        # 检查哈希值是否发生变化  
+        if previous_hash is None or previous_hash != current_hash:  
+            print(f"检测到内容变化！当前哈希值: {current_hash}")  
+            print("请进行修改")
+            url = 'http://iom.runketongyong.com/projects/helpdesk/issues?set_filter=1&tracker_id=19' 
+            webbrowser.open(url) 
+            previous_hash = current_hash  # 更新前一次哈希值
+            driver.refresh() 
+            sleep(60)
+            #if driver.refresh():
+             # print("true")
+           # else:
+            #  print("false")
+        else:  
+            print(f"内容未变化，当前哈希值: {current_hash}")  
+          
+        # 等待一段时间后再次检查  
+        time.sleep(interval)  
+  
+# 使用示例  
+if __name__ == "__main__":  
+    TARGET_URL = 'http://iom.runketongyong.com/projects/helpdesk/issues?set_filter=1&tracker_id=19'  
+    monitor_webpage(TARGET_URL, 60)  # 每60秒检查一次
